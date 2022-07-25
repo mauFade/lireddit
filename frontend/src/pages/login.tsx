@@ -3,23 +3,23 @@ import { Form, Formik } from "formik";
 import { useRouter } from "next/router";
 import InputField from "../components/InputField";
 import Wrapper from "../components/Wrapper";
-import { useRegisterMutation } from "../generated/graphql";
+import { useLoginMutation } from "../generated/graphql";
 import { toErrorMap } from "../utils/toErrorMap";
 
-const Register = () => {
+const Login = () => {
   const router = useRouter();
 
-  const [, register] = useRegisterMutation();
+  const [, login] = useLoginMutation();
 
   return (
     <Wrapper variant="small">
       <Formik
         initialValues={{ username: "", password: "" }}
         onSubmit={async (values, { setErrors }) => {
-          const response = await register(values);
-          if (response.data?.createUser.errors) {
-            setErrors(toErrorMap(response.data.createUser.errors));
-          } else if (response.data?.createUser.user) {
+          const response = await login({ options: values });
+          if (response.data?.login.errors) {
+            setErrors(toErrorMap(response.data.login.errors));
+          } else if (response.data?.login.user) {
             // Criou o usuário com sucesso, redireciona para a home page
             router.push("/");
           }
@@ -46,7 +46,7 @@ const Register = () => {
               mt={4}
               isLoading={isSubmitting}
             >
-              Registrar-se
+              Entrar
             </Button>
           </Form>
         )}
@@ -55,4 +55,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default Login;
