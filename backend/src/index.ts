@@ -4,9 +4,9 @@ import "reflect-metadata";
 import { MikroORM } from "@mikro-orm/core";
 import { __prod__ } from "./constants";
 import ormConfig from "./mikro-orm.config";
-import { MyContext } from "./types";
 
 import express from "express";
+import cors from "cors";
 import { createClient } from "redis";
 import session from "express-session";
 import connectRedis from "connect-redis";
@@ -31,6 +31,13 @@ const main = async () => {
   const redisClient = createClient({ legacyMode: true });
 
   app.use(
+    cors({
+      origin: "http://localhost:3000",
+      credentials: true,
+    })
+  );
+
+  app.use(
     session({
       name: "qid",
       store: new RedisStore({ client: redisClient, disableTouch: true }),
@@ -51,11 +58,14 @@ const main = async () => {
       resolvers: [PostResolver, UserResolver],
       validate: false,
     }),
-    context: ({ req, res }): MyContext => ({ em: emFork, req, res }),
+    context: ({ req, res }) => ({ em: emFork, req, res }),
   });
 
   await apolloServer.start();
-  apolloServer.applyMiddleware({ app });
+  apolloServer.applyMiddleware({
+    app,
+    cors: false,
+  });
 
   app.listen(PORT, () => {
     console.info(`App started at port: ${PORT}`);
