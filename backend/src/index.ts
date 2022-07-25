@@ -46,7 +46,7 @@ const main = async () => {
         maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 anos
         httpOnly: true,
         sameSite: "lax", // csrf
-        secure: __prod__, // Cookie só funciona em https
+        secure: false, // Cookie só funciona em https
       },
       secret: "redishashtokensecret",
       resave: false,

@@ -42,7 +42,6 @@ class UserResponse {
 export class UserResolver {
   @Query(() => User, { nullable: true })
   async me(@Ctx() { req, em }: MyContext): Promise<User | null> {
-    console.log(`Session:`, req.session);
     if (!req.session!.userId) {
       return null;
     }
@@ -50,6 +49,7 @@ export class UserResolver {
 
     return user;
   }
+
   // Ler todos os usuários
   @Query(() => [User])
   users(@Ctx() { em }: MyContext): Promise<User[]> {
@@ -66,7 +66,7 @@ export class UserResolver {
   @Mutation(() => UserResponse)
   async createUser(
     @Arg("options") options: UsernamePasswordInput,
-    @Ctx() { em }: MyContext
+    @Ctx() { em, req }: MyContext
   ): Promise<UserResponse> {
     if (options.username.length <= 2) {
       return {
@@ -112,6 +112,9 @@ export class UserResolver {
         };
       }
     }
+
+    req.session.userId = user.id;
+
     return { user };
   }
 
@@ -146,8 +149,7 @@ export class UserResolver {
       };
     }
 
-    req.session!.userId = user.id;
-    req.session!.randomKey = "socorro";
+    req.session.userId = user.id;
 
     return { user };
   }
